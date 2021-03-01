@@ -1,0 +1,98 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <style type="text/css">
+        #persona,#tiempo,#verbo,#respuesta,#resultado,#reinicia {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 1em;
+        }
+        #persona,#tiempo,#reinicia {
+            font-size: large;
+        }
+        #verbo {
+            font-size: xx-large;
+            font-weight: bold;
+        }
+        #in_respuesta,#bt_reinicia {
+            font-size: x-large;
+            text-align: center;
+        }
+    </style>
+    
+    <script type="text/javascript">
+        var datos = null;
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+
+        function actualiza() {
+            p = getRandomInt(0, datos.personas.length);
+            m = getRandomInt(0, datos.tiempos.length);
+            t = getRandomInt(0, datos.tiempos[m].length);
+            v = getRandomInt(1, datos.verbos.length);
+
+            document.getElementById("tiempo").innerHTML = datos.tiempos[m][t];
+            document.getElementById("persona").innerHTML = datos.personas[p];
+            document.getElementById("verbo").innerHTML = datos.verbos[v].infinitivo;
+
+            document.getElementById("resultado").innerHTML = "";
+            document.getElementById("bt_reinicia").style.display = "none";
+        }
+
+        function comprueba() {
+            respuesta = document.getElementById("in_respuesta").value;
+            if (m == 0) {
+                correcta = datos.verbos[v].conjugaciones[t][p].split("/");
+            }
+            else {
+                correcta = datos.verbos[0].conjugaciones[t][p].split("/");
+                for (i = 0; i < correcta.length; i++)
+                    correcta[i] = correcta[i] + " " + datos.verbos[v].participio;
+            }
+
+            console.log("respuesta: " + respuesta);
+            console.log("correcta" + correcta);
+
+            if (correcta.includes(respuesta)) {
+                document.getElementById("resultado").innerHTML = "¡¡¡BIEN!!!";
+                document.getElementById("resultado").style.color = "green";
+            }
+            else {
+                document.getElementById("resultado").innerHTML = "Ups, la respuesta era " + correcta;
+                document.getElementById("resultado").style.color = "red";
+            }
+
+            document.getElementById("bt_reinicia").style.display = "initial";
+        }
+
+        window.addEventListener("load", function () {
+            fetch("./verbos.json")
+                .then(response => response.json())
+                .then(json => {
+                    datos = json;
+                    actualiza();
+                });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="persona"></div>
+    <div id="tiempo"></div>
+    <div id="verbo"></div>
+
+    <div id="respuesta">
+        <input id="in_respuesta" onchange="comprueba()"></input>
+    </div>
+    <br>
+    <div id="resultado"></div>
+    <div id="reinicia">
+        <button id="bt_reinicia" onclick="actualiza()" style="display: none">Otra vez</button>
+    </div>
+</body>
+
+</html>
